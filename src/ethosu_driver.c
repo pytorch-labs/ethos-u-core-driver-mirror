@@ -426,6 +426,18 @@ int ethosu_init(struct ethosu_driver *drv,
 
     ethosu_register_driver(drv);
 
+    // ethosu_semaphore is used for resource (driver structure and ETHOSU NPU hardware) management:
+    // The semaphore count indicates the number of available resources.
+    // After creating the semaphore the count is zero (= no free resources available).
+    // To register an NPU resource just give the semaphore. This increments the counter.
+    // Note 1: Subsequent calls to ethosu_init() will further increment the semaphore count
+    //     which is correct if the system has more than one EthosU NPUs.
+    // Note 2: drv->semaphore is used to sync between EthosU IRQ handler and task level.
+    //     The IRQ handler gives the semaphore to indicate that the NPU job is done.
+    //     If drv->semaphore is not given, then ethosu_wait() yields at ethosu_semaphore_take().
+    //     No need to give drv->semaphore here.
+    ethosu_semaphore_give(ethosu_semaphore);
+
     return 0;
 }
 
@@ -705,24 +717,22 @@ struct ethosu_driver *ethosu_reserve_driver(void)
 {
     struct ethosu_driver *drv = NULL;
 
-    do
+    LOG_INFO("Reserve NPU driver handle before using it...");
+    /* TODO: feedback needed aout how to handle error (-1) return value */
+    ethosu_semaphore_take(ethosu_semaphore);
+
+    /* TODO: feedback needed aout how to handle error (-1) return value */
+    ethosu_mutex_lock(ethosu_mutex);
+    drv = ethosu_find_and_reserve_driver();
+    /* TODO: feedback needed aout how to handle error (-1) return value */
+    ethosu_mutex_unlock(ethosu_mutex);
+
+    if (drv == NULL)
     {
-        /* TODO: feedback needed aout how to handle error (-1) return value */
-        ethosu_mutex_lock(ethosu_mutex);
-        drv = ethosu_find_and_reserve_driver();
-        /* TODO: feedback needed aout how to handle error (-1) return value */
-        ethosu_mutex_unlock(ethosu_mutex);
-
-        if (drv != NULL)
-        {
-            break;
-        }
-
-        LOG_INFO("Waiting for NPU driver handle to become available...");
-        /* TODO: feedback needed aout how to handle error (-1) return value */
-        ethosu_semaphore_take(ethosu_semaphore);
-
-    } while (1);
+        // This should not happen because taking the semaphore should block if there is no driver available.
+        // If we end up here it is a hard error. Return NULL to that the caller can react.
+        return NULL;
+    }
 
     return drv;
 }
