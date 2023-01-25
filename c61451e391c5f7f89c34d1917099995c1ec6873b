@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "35ce770f_4b4f9d07",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000186
+      },
+      "writtenOn": "2023-01-25T13:35:31Z",
+      "side": 1,
+      "message": "Thanks for your contribution. We have merged the patch linked below, which updates the semaphore handling in a similar way to your patch.\n\nhttps://review.mlplatform.org/c/ml/ethos-u/ethos-u-core-driver/+/9022",
+      "revId": "c61451e391c5f7f89c34d1917099995c1ec6873b",
+      "serverId": "e7c18949-9f1d-4125-8f68-54b4bb1f6e6e"
+    }
+  ]
+}
