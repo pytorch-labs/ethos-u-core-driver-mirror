@@ -1,6 +1,5 @@
 #
-# SPDX-FileCopyrightText: Copyright 2019-2021, 2023 Arm Limited and/or its affiliates <open-source-office@arm.com>
-#
+# SPDX-FileCopyrightText: Copyright 2019-2021, 2023-2024 Arm Limited and/or its affiliates <open-source-office@arm.com>
 # SPDX-License-Identifier: Apache-2.0
 #
 # Licensed under the Apache License, Version 2.0 (the License); you may
@@ -19,6 +18,12 @@
 cmake_minimum_required(VERSION 3.15.6)
 
 project(ethosu_core_driver VERSION 0.0.1)
+
+#
+# Compile options
+#
+
+add_compile_options(-Werror)
 
 #
 # Build options
